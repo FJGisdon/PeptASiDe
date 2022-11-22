@@ -3,7 +3,7 @@
 set ignore_case, off
 
 # Load the structure
-load f5xtd.cif, complex
+load 5xtd.cif, complex
 
 # Select and color the found clusters
 select cluster0, chain A+F+K+L+M+O
