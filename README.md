@@ -1,2 +1,2 @@
-# PepSiDe
-PEPtidase active SIte DEtector/DEsigner
+# PeptASiDe
+PEPTidase Active SIte DEtector/DEsigner
