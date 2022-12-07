@@ -6,67 +6,44 @@
 version ='1.0.0'
 # ---------------------------------------------------------------------------
 """
-Main
+Application to prepare a list of peptidases from the PDB with their
+corresponding active sites.
 """
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
-import logging
 import argparse
 import sys
 import os
 
+sys.path.append('../src/')
+
+from peptaside.io.loggingSetup import customLogger
 
 # ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
-logger = logging.getLogger()
 
-def main():
-	"""  """
-	args = create_parser()
-	
-	#check_file_writable(args.output)
-	
-	logger = setup_logging()
+def createPeptidaseActiveSiteCSV():
+    """  """
+    # Read the settings and arguments
+    #args = create_parser()
 
-	log("Program started", "i")
-	log("Program finished", "i")
+    # create the logger
+    cl = customLogger(__name__)
+    # TODO
+    # Set up the logger for every new module, which is used to always update the name, which is printed in the end. Could this be done with a borg class? Is that something that implements a class and every new instance has the same information? Is the logger then changed for all of them?
+    cl.set_up_logger()
 	
-def setup_logging():
-    """
-    Configuration for logger. 
-    logger = logging.getLogger(__name__) in all other modules
-    """
-    logging.basicConfig(format = "[%(levelname)s] %(message)s")
-    log_level()
+    #check_file_writable(args.output)
+	
+    cl.log("Program started", "i")
+    cl.log("This is the first output!!")
+    cl.log("This is an ERROR test...", "e")
+    cl.log("Program finished", "i")
+	
 
     
-def log_level():
-	""" Assign the log level. """
-	log_level = logging.INFO
-	#if (args.debug):
-	#	log_level = logging.DEBUG
-	#elif (args.verbose):
-	#	log_level = logging.INFO
-	logger.setLevel(log_level)
-	
-	
-def log(message, level=""):
-    """ Prints message according to settings. """
-    if (level == "c"):
-        logger.critical(message)
-    if (level == "e"):
-        logger.error(message)
-    elif (level == "w"):
-        logger.warning(message)
-    elif (level == "i"):
-        logger.info(message)
-    elif (level == "d"):
-        logger.debug(message)
-    else:
-        args.output.write(message + "\n")
-
 
 def check_file_writable(fp):
     """Checks if the given filepath is writable"""
@@ -150,4 +127,4 @@ def create_parser():
 # Program
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":    
-    main()
+    createPeptidaseActiveSiteCSV()
