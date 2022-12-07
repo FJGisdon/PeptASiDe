@@ -6,7 +6,7 @@
 version ='1.0.0'
 # ---------------------------------------------------------------------------
 """
-Preparation of a list of peptidases with their active site residues.
+Assign active site residues.
 """
 # ---------------------------------------------------------------------------
 # Imports

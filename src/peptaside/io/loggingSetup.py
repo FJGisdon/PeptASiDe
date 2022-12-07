@@ -18,9 +18,9 @@ import sys
 # Classes
 # ---------------------------------------------------------------------------
 
-class customLogger:
+class customLogger(object):
     """
-    A class to configure a custom logger.
+    A class to configure a custom logger using the singleton borg design pattern.
 
     Attributes
     ----------
@@ -35,6 +35,8 @@ class customLogger:
     log_level():
             Set the log level, silent, verbose, debug.
     """
+
+    #_shared_borg_state = {}
 
     def __init__(self, logger_name: str):
         """
