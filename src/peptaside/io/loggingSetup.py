@@ -18,13 +18,13 @@ import sys
 # Classes
 # ---------------------------------------------------------------------------
 
-class customLogger(object):
+class customLogger():
     """
-    A class to configure a custom logger using the singleton borg design pattern.
+    A class to configure a custom logger.
 
     Attributes
     ----------
-    output : str, string providing the path for the output file;
+    logOutput : str, string providing the path for the output file;
                     default: sys.stdout
 
     Methods
@@ -32,11 +32,12 @@ class customLogger(object):
     log():
             Custom log function to either use use the built-in functionality of logging
             or to print results to the desired location.
-    log_level():
+    setUpLogger():
+            Set up logger.
+    setLogLevel():
             Set the log level, silent, verbose, debug.
     """
 
-    #_shared_borg_state = {}
 
     def __init__(self, logger_name: str):
         """
@@ -47,12 +48,18 @@ class customLogger(object):
                 Commonly __main__ of the respective file is used.
 
         """
-
-        # Set logger for current file
+        
+        # Initialize the logger and basic settings before the user input is processed
         self.logger = logging.getLogger(logger_name)
+        # Stream initial output to screen
+        self.logOutput = sys.stdout
+        # If not overwritten by the user, the default log level is error
+        self.setLogLevel()
+        # Setup logging
+        logging.basicConfig()#format = "[%(levelname)s] %(message)s")
 
 
-    def set_up_logger(self, output: str = sys.stdout, loglevel: str = 'silent'):
+    def setUpLogger(self, usrOutput: str = sys.stdout, loglevel: str = 'silent'):
         """
 
         Set up the custom logger
@@ -61,7 +68,7 @@ class customLogger(object):
                 default: sys.stdout
         :param loglevel: str, the log level, which should be used:
                                 silent: only print results and error messages to output
-                                warning: print everything upt to warnings to output
+                                warning: print everything up to warnings to output
                                 verbose: print status messages in addition to output
                                 debug: print everything to output
                 default: 'silent'
@@ -69,8 +76,8 @@ class customLogger(object):
         """
 
 
-        self.output: str = output
-        self.set_loglevel(loglevel)
+        self.logOutput: str = usrOutput
+        self.setLogLevel(loglevel)
 
         # Setup logging
         logging.basicConfig()#format = "[%(levelname)s] %(message)s")
@@ -100,11 +107,11 @@ class customLogger(object):
         elif (level == "d"):
             self.logger.debug(message)
         else:
-            self.output.write(message + "\n")
+            self.logOutput.write(message + "\n")
 
     
 
-    def set_loglevel(self, loglevel: str):
+    def setLogLevel(self, loglevel: str = None):
         """
 
         Set the log level for the prints.

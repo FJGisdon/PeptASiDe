@@ -15,31 +15,38 @@ corresponding active sites.
 import sys
 sys.path.append('../src/')
 
+import peptaside.io.settings
 from peptaside.io.loggingSetup import customLogger
-from peptaside.util.prepareOutputFile import check_file_writable
+from peptaside.io.inputParser import inputParser
 
 # ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
-
+#TODO Make initialize a class so that it is called by the user and 
+# everything is set up and include the parser
 def initializePeptaside():
     """
     Initialize.
     """
-    
-    # Parse and process the settings and input arguments
-    # args = create_parser()
-    # check_file_writable(args.output)
 
-    # Create the logger
-    cl = customLogger(__name__)
+    # First create the logger then parse the input and then set up the logger
+    CL = customLogger(__name__)
+
+    # Parse and process the settings and input arguments
+    parser = inputParser()
+
     # Set up the logger
-    cl.set_up_logger()
-    # TODO
-    # Set up the logger for every new module, which is used to always update the name, which is printed in the end. Could this be done with a borg class? Is that something that implements a class and every new instance has the same information? Is the logger then changed for all of them?
-    cl.log("Program started", "i")
-    cl.log("This is the first output!!")
-    cl.log("This is an ERROR test...", "e")
+    CL.setUpLogger()
+
+    # Test of log level adjustment
+    CL.setLogLevel("verbose")
+
+    CL.log("Program started", "i")
+    CL.log("This is the first output!!")
+    CL.log("This is an ERROR test...", "e")
+
+    # Test of name print for different module log
+    parser2 = inputParser()
 
 
 def createPeptidaseActiveSiteCSV():
@@ -49,8 +56,8 @@ def createPeptidaseActiveSiteCSV():
             potential active sites.
     """
 
-    cl.log("These are the results...")
-    cl.log("Program finished", "i")
+    CL.log("These are the results...")
+    CL.log("Program finished", "i")
 	
     
 # ---------------------------------------------------------------------------
