@@ -16,7 +16,13 @@ import argparse
 import sys
 import os
 
-from .settings import *
+from .loggingSetup import customLogger
+
+# ---------------------------------------------------------------------------
+# Logger
+# ---------------------------------------------------------------------------
+# First create the default logger, later parse the input and then set up the logger
+cl = customLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Classes
@@ -40,16 +46,13 @@ class inputParser:
             Description.
     """
 
+
     def __init__(self):
         """
 
         """
 
-        # Test if the logger takes the correct file as name and functions correctly
-        CL.log("inputParser entered", "i")
-        CL.log("Here are no results, but anyway...")
-        CL.log("This is an ERROR test...", "e")
-
+        pass
 
 
     def _createParser(self):
@@ -127,3 +130,5 @@ class inputParser:
     
     def createPathAndFile(self):
         pass
+
+# ---------------------------------------------------------------------------

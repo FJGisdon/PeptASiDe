@@ -15,38 +15,30 @@ corresponding active sites.
 import sys
 sys.path.append('../src/')
 
-import peptaside.io.settings
+#import peptaside.io.settings
 from peptaside.io.loggingSetup import customLogger
 from peptaside.io.inputParser import inputParser
 
 # ---------------------------------------------------------------------------
+# Logger
+# ---------------------------------------------------------------------------
+# First create the default logger, later parse the input and then set up the logger
+cl = customLogger(__name__)
+
+# ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
-#TODO Make initialize a class so that it is called by the user and 
-# everything is set up and include the parser
+
 def initializePeptaside():
     """
     Initialize.
     """
 
-    # First create the logger then parse the input and then set up the logger
-    CL = customLogger(__name__)
-
     # Parse and process the settings and input arguments
     parser = inputParser()
 
     # Set up the logger
-    CL.setUpLogger()
-
-    # Test of log level adjustment
-    CL.setLogLevel("verbose")
-
-    CL.log("Program started", "i")
-    CL.log("This is the first output!!")
-    CL.log("This is an ERROR test...", "e")
-
-    # Test of name print for different module log
-    parser2 = inputParser()
+    cl.setUpLogger(loglevel = 'verbose')
 
 
 def createPeptidaseActiveSiteCSV():
@@ -56,8 +48,8 @@ def createPeptidaseActiveSiteCSV():
             potential active sites.
     """
 
-    CL.log("These are the results...")
-    CL.log("Program finished", "i")
+    cl.log("These are the results...")
+    cl.log("Program finished", "i")
 	
     
 # ---------------------------------------------------------------------------
@@ -66,3 +58,5 @@ def createPeptidaseActiveSiteCSV():
 if __name__ == "__main__":    
     initializePeptaside()
     #createPeptidaseActiveSiteCSV()
+
+# ---------------------------------------------------------------------------

@@ -7,6 +7,10 @@ version ='1.0.0'
 # ---------------------------------------------------------------------------
 """
 Setup and configure the logger.
+Create an instance in the main application, the logger will be set up with 
+default settings then and can be customized by its functions. In all other 
+files of the project only create an instance, the settings are kept only the
+name of the logger will be changed to the file the logging message is written.
 """
 # ---------------------------------------------------------------------------
 # Imports
@@ -38,6 +42,11 @@ class customLogger():
             Set the log level, silent, verbose, debug.
     """
 
+    logger = logging.getLogger()
+    logOutput = sys.stdout
+    loglevel = 'verbose'
+    initialized = False
+
 
     def __init__(self, logger_name: str):
         """
@@ -49,17 +58,22 @@ class customLogger():
 
         """
         
-        # Initialize the logger and basic settings before the user input is processed
+        # Initialize the logger and basic settings
         self.logger = logging.getLogger(logger_name)
-        # Stream initial output to screen
-        self.logOutput = sys.stdout
-        # If not overwritten by the user, the default log level is error
-        self.setLogLevel()
-        # Setup logging
-        logging.basicConfig()#format = "[%(levelname)s] %(message)s")
+
+        # For the first time an instance of this class in a program run is created,
+        # initialization with default parameters is performed
+        if not self.__class__.initialized:
+            # Stream initial output to screen
+            self.__class__.logOutput = sys.stdout
+            self.setLogLevel()
+            # Setup logging
+            logging.basicConfig(format = "[%(levelname)s] %(name)s - %(message)s")
+            # Set initialization to True
+            self.__class__.initialized = True
 
 
-    def setUpLogger(self, usrOutput: str = sys.stdout, loglevel: str = 'silent'):
+    def setUpLogger(self, usrOutput: str = sys.stdout, loglevel: str = 'silent', formatString = "[%(levelname)s] %(name)s - %(message)s"):
         """
 
         Set up the custom logger
@@ -76,18 +90,41 @@ class customLogger():
         """
 
 
-        self.logOutput: str = usrOutput
+        self.__class__.logOutput: str = usrOutput
         self.setLogLevel(loglevel)
+        logging.basicConfig(format = formatString)
 
-        # Setup logging
-        logging.basicConfig()#format = "[%(levelname)s] %(message)s")
 
-    
+    def setLogLevel(self, loglevel: str = None):
+        """
+
+        Set the log level for the prints. Here the class variable logger is 
+        modified to adjust the logging level for all instances.
+
+        param: loglevel: str, the log level, which should be used
+
+        """
+
+        if loglevel == 'verbose':
+            self.__class__.logger.setLevel(logging.INFO)
+        elif loglevel == 'debug':
+            self.__class__.logger.setLevel(logging.DEBUG)
+        elif loglevel == 'warning':
+            self.__class__.logger.setLevel(logging.WARNING)
+        elif loglevel == 'silent':
+            self.__class__.logger.setLevel(logging.CRITICAL)
+        else:
+            self.__class__.logger.setLevel(logging.ERROR)
+
+
 
     def log(self, message: str, level: str = ""):
         """
 
-        Print either log messages or results. This is useful for pipelining
+        Print either log messages or results. This is useful for pipelines.
+        This function uses the respective instances, which are created in 
+        the individual files or classes. In this setup the filename of the
+        file is listed from which the message is printed.
 
         param: message: str, string containing the message to be printed
         param: level: str, the log level, which should be used, by default
@@ -107,26 +144,6 @@ class customLogger():
         elif (level == "d"):
             self.logger.debug(message)
         else:
-            self.logOutput.write(message + "\n")
+            self.__class__.logOutput.write(message + "\n")
 
-    
-
-    def setLogLevel(self, loglevel: str = None):
-        """
-
-        Set the log level for the prints.
-
-        param: loglevel: str, the log level, which should be used
-
-        """
-
-        if loglevel == 'verbose':
-            self.logger.setLevel(logging.INFO)
-        elif loglevel == 'debug':
-            self.logger.setLevel(logging.DEBUG)
-        elif loglevel == 'warning':
-            self.logger.setLevel(logging.WARNING)
-        else:
-            self.logger.setLevel(logging.ERROR)
-
-
+# ---------------------------------------------------------------------------
