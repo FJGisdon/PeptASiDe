@@ -22,7 +22,7 @@ from peptaside.io.inputParser import inputParser
 # ---------------------------------------------------------------------------
 # Logger
 # ---------------------------------------------------------------------------
-# First create the default logger, later parse the input and then set up the logger
+# Local logger instance
 cl = customLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -36,9 +36,11 @@ def initializePeptaside():
 
     # Parse and process the settings and input arguments
     parser = inputParser()
-
-    # Set up the logger
+    # Set up the logger to verbose for development
     cl.setUpLogger(loglevel = 'verbose')
+
+    return parser.args
+
 
 
 def createPeptidaseActiveSiteCSV():
@@ -48,15 +50,17 @@ def createPeptidaseActiveSiteCSV():
             potential active sites.
     """
 
-    cl.log("These are the results...")
+    cl.log(f"These are the args in main: {vars(args)}")
     cl.log("Program finished", "i")
 	
     
 # ---------------------------------------------------------------------------
 # Program
 # ---------------------------------------------------------------------------
-if __name__ == "__main__":    
-    initializePeptaside()
-    #createPeptidaseActiveSiteCSV()
+if __name__ == "__main__":   
+    # Parse settings and input arguments and eventually customize the logger
+    args = initializePeptaside()
+    # Start the application
+    createPeptidaseActiveSiteCSV()
 
 # ---------------------------------------------------------------------------
