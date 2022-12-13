@@ -1,0 +1,2 @@
+These are the args in main: {'verbosity': 'verbose', 'outputLog': <_io.TextIOWrapper name='../data/results/createPeptidaseActiveSiteCSV/createPeptidaseActiveSiteCSV.out' mode='w' encoding='UTF-8'>, 'outputCSV': <_io.TextIOWrapper name='../data/results/createPeptidaseActiveSiteCSV/PeptidaseActiveSites.csv' mode='w' encoding='UTF-8'>}
+Write to output file
