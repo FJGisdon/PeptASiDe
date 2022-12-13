@@ -100,7 +100,7 @@ class customLogger():
             cls._logger.setLevel(logging.INFO)
         elif loglevel == 'debug':
             cls._logger.setLevel(logging.DEBUG)
-        elif loglevel == 'warning':
+        elif loglevel == 'alerting':
             cls._logger.setLevel(logging.WARNING)
         elif loglevel == 'silent':
             cls._logger.setLevel(logging.ERROR)
@@ -132,13 +132,14 @@ class customLogger():
             logging.basicConfig(format = formatString)
 
 
-    def log(self, message: str, level: str = None):
+    def log(self, message: str, level: str = None, output: str = None):
         """
 
         Print either log messages or results. This is useful for pipelines.
         This function uses the respective instances, which are created in 
         the individual files or classes. In this setup the filename of the
         file is listed from which the message is printed.
+        Additionally an output path can be provided for specific output.
 
         param: message: str, string containing the message to be printed
         param: level: str, the log level, which should be used
@@ -159,6 +160,8 @@ class customLogger():
         elif (level == "d"):
             self.logger.debug(message)
         else:
-            self.__class__._logOutput.write(message + "\n")
+            if output is None:
+                self.__class__._logOutput.write(message + "\n")
+            else: output.write(message + "\n")
 
 # ---------------------------------------------------------------------------

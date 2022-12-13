@@ -36,9 +36,9 @@ def initializePeptaside():
 
     # Parse and process the settings and input arguments
     parser = inputParser()
-    # Set up the logger to verbose for development
-    cl.setUpLogger(loglevel = 'verbose')
-
+    # Set up the user-defined loglevel and output
+    cl.setUpLogger(usrOutput = parser.args.outputLog, loglevel = parser.args.verbosity)
+    
     return parser.args
 
 
@@ -52,6 +52,8 @@ def createPeptidaseActiveSiteCSV():
 
     cl.log(f"These are the args in main: {vars(args)}")
     cl.log("Program finished", "i")
+    cl.log("Write to output file")
+    cl.log("Write to csv file", output = args.outputCSV)
 	
     
 # ---------------------------------------------------------------------------

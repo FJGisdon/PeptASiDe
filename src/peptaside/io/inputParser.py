@@ -54,7 +54,7 @@ class baseParser(object):
         TODO
         """
 
-        self.__class__._args = self._parseArguments()
+        self.__class__._args = self._parseBaseArguments().parse_args()
 
 
 
@@ -65,33 +65,40 @@ class baseParser(object):
         return cls._args
   
 
-    def _parseArguments(self):
+    def _parseBaseArguments(self):
         """ TODO """
         ## create the parser
-        parseInput = argparse.ArgumentParser(description="Parse user arguments and settings.",
-                                                fromfile_prefix_chars="@")
+        parseInput = argparse.ArgumentParser(add_help=False, fromfile_prefix_chars="@")
 
         # add mutually exclusive group for silent / verbose
         verbosity = parseInput.add_mutually_exclusive_group()
         verbosity.add_argument('-s',
                                 '--silent',
-                                action='store_true',
-                                help='only print results to stdout, e.g., no status messages and meta information')
+                                action='store_const',
+                                dest='verbosity',
+                                const='silent',
+                                help='only print errors to stdout, results to output')
 
         verbosity.add_argument('-a',
-                                '--allerting',
-                                action='store_true',
-                                help='print more to stdout, e.g., status messages and meta information')
+                                '--alerting',
+                                action='store_const',
+                                dest='verbosity',
+                                const='alerting',
+                                help='print up to warnings to stdout, results to output')
 
         verbosity.add_argument('-v',
                                 '--verbose',
-                                action='store_true',
-                                help='print more to stdout, e.g., status messages and meta information')
+                                action='store_const',
+                                dest='verbosity',
+                                const='verbose',
+                                help='print additional information to stdout, results to output')
 
         verbosity.add_argument('-d',
                                 '--debug',
-                                action='store_true',
-                                help='print everything including debug information')
+                                action='store_const',
+                                dest='verbosity',
+                                const='debut',
+                                help='print every information to stdout, results to output')
 
         # add command line arguments
         parseInput.add_argument('--version',
@@ -101,36 +108,25 @@ class baseParser(object):
         parseInput.add_argument('-o',
                                 '--outputfile',
                                 metavar = 'path',
-                                dest = 'output',
+                                dest = 'outputLog',
                                 type = argparse.FileType('w'),
                                 default = sys.stdout,
-                                help = 'PML file for PyMOL to file')
+                                help = 'results file')
 
-        return parseInput.parse_args()
-
-
-    def checkFileWritable(self, fp):
-        """Checks if the given filepath is writable"""
-        if os.path.exists(fp):
-            if os.path.isfile(fp):
-                return os.access(fp, os.W_OK)
-            else:
-                return False
-        # target does not exist, check perms on parent dir
-        parent_dir = os.path.dirname(fp)
-        if not parent_dir: parent_dir = '.'
-        return os.access(parent_dir, os.W_OK)
+        return parseInput
 
 
-    def createPathAndFile(self):
-        pass
+    @property
+    def outputLog(self):
+        """ TODO """
+        return self.__class__._args.outputLog
 
 
 
 
 class inputParser(baseParser):
     """
-    A class to parse the input and prepare the output file if specified.
+    A class to parse the input and prepare the output .
 
     Attributes
     ----------
@@ -140,10 +136,6 @@ class inputParser(baseParser):
     -------
     createParser():
             Description.
-    checkFileWritable():
-            Description.
-    createPathAndFile():
-            Description.
     """
 
 
@@ -151,20 +143,23 @@ class inputParser(baseParser):
         """
         TODO
         """
-        super().__init__()
-        cl.log("Another test message from parser child.", "e")
+        self.__class__._args = self._parseAdditionalArguments().parse_args()
+
 
     # Should there also be a function to add arguments from within the main application? - Yes
-    # Should there be all arguments accessible from this child class?
-    def _parseArguments(self):
+    def _parseAdditionalArguments(self):
         """ TODO """
-        super()._parseArguments()
+
+        ## create the parser
+        parseInput = argparse.ArgumentParser(parents=[self._parseBaseArguments()],\
+                                                        fromfile_prefix_chars="@")
+
         ## add arguments
     
         # positional arguments
-        parseInput.add_argument('protein_structure',
-                                metavar = '<path to PDB/mmCIF>',
-                                help = 'name of the PDB or mmCIF structure')
+        #parseInput.add_argument('protein_structure',
+        #                        metavar = '<path to PDB/mmCIF>',
+        #                        help = 'name of the PDB or mmCIF structure')
     
         #parseInput.add_argument('graph_file_path',
         #                        metavar = '<path to graph file (GML)>',
@@ -177,12 +172,20 @@ class inputParser(baseParser):
     
         # add command line arguments
     
-        parseInput.add_argument('-w',
-                                '--weighttype',
-                                metavar = 'edge weight type',
-                                default = "absoluteWeight",
-                                help = 'the edge weight type to use')
+        #parseInput.add_argument('-w',
+        #                        '--weighttype',
+        #                        metavar = 'edge weight type',
+        #                        default = "absoluteWeight",
+        #                        help = 'the edge weight type to use')
+
+        parseInput.add_argument('-t',
+                                '--csvtable',
+                                metavar = 'path',
+                                dest = 'outputCSV',
+                                type = argparse.FileType('w'),
+                                default = sys.stdout,
+                                help = 'csv file to store the peptidases and active sites')
     
-        return parseInput.parse_args()
+        return parseInput
     
 # ---------------------------------------------------------------------------
