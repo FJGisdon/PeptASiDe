@@ -18,6 +18,7 @@ sys.path.append('../src/')
 #import peptaside.io.settings
 from peptaside.io.loggingSetup import customLogger
 from peptaside.io.inputParser import inputParser
+from peptaside.util.PDButilities import searchXray
 
 # ---------------------------------------------------------------------------
 # Logger
@@ -46,14 +47,26 @@ def initializePeptaside():
 def createPeptidaseActiveSiteCSV():
     """
     Create a CSV file which contains peptidases and their active sites.
+    Search for peptidases with active site residues in MEROPS/UniProt/...
+    Only take those, whith complete information and obtain structural
+    information from PDB.
+    Information can be found in UniProt json download
+    'Active site' or 'Binding site'
+    - search PDB for available structures with certain quality
+    - search maybe UniProt to find active site residues
+    - fill csv with relevant information
     TODO: Later this should be a database with additional residues for
             potential active sites.
+
+    :param: peptidaseStructures: list, description...;
     """
 
-    cl.log(f"These are the args in main: {vars(args)}")
-    cl.log("Program finished", "i")
-    cl.log("Write to output file")
-    cl.log("Write to csv file", output = args.outputCSV)
+    peptidaseStructures = searchXray()
+    cl.log(peptidaseStructures)
+    #cl.log(f"These are the args in main: {vars(args)}")
+    #cl.log("Program finished", "i")
+    #cl.log("Write to output file")
+    #cl.log("Write to csv file", output = args.outputCSV)
 	
     
 # ---------------------------------------------------------------------------

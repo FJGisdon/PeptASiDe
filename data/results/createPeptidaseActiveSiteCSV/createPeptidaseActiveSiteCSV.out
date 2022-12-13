@@ -1,2 +1,36 @@
-These are the args in main: {'verbosity': 'verbose', 'outputLog': <_io.TextIOWrapper name='../data/results/createPeptidaseActiveSiteCSV/createPeptidaseActiveSiteCSV.out' mode='w' encoding='UTF-8'>, 'outputCSV': <_io.TextIOWrapper name='../data/results/createPeptidaseActiveSiteCSV/PeptidaseActiveSites.csv' mode='w' encoding='UTF-8'>}
-Write to output file
+{
+  "query_id" : "bc5bd9d9-5aec-4db2-b365-ae0fb10033c7",
+  "result_type" : "entry",
+  "total_count" : 58,
+  "result_set" : [ {
+    "identifier" : "1KIM",
+    "score" : 0.9997421333462085
+  }, {
+    "identifier" : "1KI8",
+    "score" : 0.9994349084474696
+  }, {
+    "identifier" : "1KI3",
+    "score" : 0.9990697944504761
+  }, {
+    "identifier" : "1KI4",
+    "score" : 0.9990697944504761
+  }, {
+    "identifier" : "1QHI",
+    "score" : 0.9987663374812094
+  }, {
+    "identifier" : "1KI2",
+    "score" : 0.9987498466729999
+  }, {
+    "identifier" : "1KI7",
+    "score" : 0.9987498466729999
+  }, {
+    "identifier" : "1KI6",
+    "score" : 0.9986694968003591
+  }, {
+    "identifier" : "1E2J",
+    "score" : 0.9981109950465592
+  }, {
+    "identifier" : "2KI5",
+    "score" : 0.9979795742337565
+  } ]
+}
