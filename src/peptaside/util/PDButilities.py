@@ -31,29 +31,22 @@ class requestVariablesPDB:
     """
     TODO
     """
-    # Variables
-    entity_ids: list
-
-    # Requests sequence positional features, namely here the UniProt ID.
-    # A list of entity IDs is required (e.g. ["7VPG_2"]).
-    requestUniProtID = """{
-  polymer_entities(entity_ids: ["7VPG_2"]) {
-    rcsb_polymer_entity_container_identifiers {
-      entry_id
-      entity_id
-      uniprot_ids
-    }
-  }
-}"""
-    test =  """
-query Query {
-  allFilms {
-    films {
-      title
-    }
-  }
-}
-"""
+    @staticmethod
+    def uniProtIDs(entity_ids: list):
+        """  """
+        # Requests sequence positional features, namely here the UniProt ID.
+        # A list of entity IDs is required (e.g. ["7VPG_2"]).
+        uniProtIDs = """query {
+            polymer_entities(entity_ids: """+json.dumps(entity_ids)+""") {
+                rcsb_polymer_entity_container_identifiers {
+                    entry_id
+                    entity_id
+                    uniprot_ids
+                    }
+                }
+            }
+            """
+        return uniProtIDs
 
 
 @dataclass
@@ -134,7 +127,7 @@ def searchPDB(query):
     in the dataclass 'queryVariablesPDB'.
     """
     searchUrlEndpoint: str = 'https://search.rcsb.org/rcsbsearch/v2/query'
-
+    
     # Make it bytes
     jsonQuery = json.dumps(query).encode("utf-8")
 
@@ -151,18 +144,23 @@ def requestDataPDB(query):
     """
     TODO
     """
-    searchUrlEndpoint: str = 'https://data.rcsb.org/rest/v1/core'
-    searchUrlEndpoint: str = "https://swapi-graphql.netlify.app/.netlify/functions/index"
-    cl.log(query, "i")
+    searchUrlEndpoint: str = 'https://data.rcsb.org/graphql'
     cl.log("Performing query", "i")
-    result = requests.post(searchUrlEndpoint, data={'query': query})
-    
-    cl.log(result, "i")
+    #result = requests.post(searchUrlEndpoint, data={'query': query})
+    result = requests.get(f'https://data.rcsb.org/graphql?query={query}')
     results = []
-    for query_hit in result.json()["data"]:
-        results.append(query_hit["uniprot_ids"])
+    for data in result.json()["data"]:
+        for polymerEntity in data["polymer_entities"]:
+            for identifier in polymerEntity:
+                for entry in identifier:
+                     results.append(entry)
+    cl.log(results, "i")
 
-    return results
+    #{'data': {'polymer_entities': [{'rcsb_polymer_entity_container_identifiers': {'entry_id': '2OQ5', 'entity_id': '1', 'uniprot_ids': ['Q9UL52']}}, {'rcsb_polymer_entity_container_identifiers': {'entry_id': '2Z3B', 'entity_id': '1', 'uniprot_ids': ['P39070']}}, {'rcsb_polymer_entity_container_identifiers': {'entry_id': '3TJQ', 'entity_id': '1', 'uniprot_ids': ['Q92743']}}]}}
+
+
+    return result.json()["data"]
+
 
 
 def searchStructureMotif():

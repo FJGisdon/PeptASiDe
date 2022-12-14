@@ -69,8 +69,10 @@ def createPeptidaseActiveSiteCSV():
     cl.log(f"Results written to {args.outputLog}", "i")
 
     cl.log("Assign catalytic serine to structure.", "i") 
-    uniProtIDs: list = requestDataPDB(requestVariablesPDB.test)
+    uniProtIDs: list = requestDataPDB(requestVariablesPDB.uniProtIDs(entity_ids=serinePeptidaseSearchResults))
     cl.log("UniProt IDs for serine peptidase entities:\n{}".format(", ".join(uniProtIDs)))
+    cl.log("UniProt IDs for serine peptidase entities:\n{}".format(", ".join(uniProtIDs)), "i")
+    cl.log("Obtain the active site serine via UniProt and combine with previous information to CSV", "i")
 
 
 # ---------------------------------------------------------------------------
