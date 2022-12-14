@@ -17,7 +17,10 @@ sys.path.append('../src/')
 
 from peptaside.io.loggingSetup import customLogger
 from peptaside.io.inputParser import inputParser
-from peptaside.util.PDButilities import queryVariables, searchPDB
+from peptaside.util.PDButilities import queryVariablesPDB, \
+                                        searchPDB, \
+                                        requestVariablesPDB, \
+                                        requestDataPDB
 
 # ---------------------------------------------------------------------------
 # Logger
@@ -59,13 +62,15 @@ def createPeptidaseActiveSiteCSV():
     """
 
     cl.log("Performing PDB search for serine peptidases with the EC code 3.4.21.", "i")
-    serinePeptidaseSearchResults: list = searchPDB(queryVariables.serinePeptidasesEntitySequenceIdentity95)
+    serinePeptidaseSearchResults: list = searchPDB(queryVariablesPDB.serinePeptidasesEntities)
 
     cl.log("PDB search results for serine peptidases with the EC code 3.4.21:\n{}".format(", ".join(serinePeptidaseSearchResults)))
-    cl.log(f"Results for the PDB search:\n{serinePeptidaseSearchResults}", "i")
+    cl.log(f"{len(serinePeptidaseSearchResults)} results for the PDB search:\n{serinePeptidaseSearchResults}", "i")
     cl.log(f"Results written to {args.outputLog}", "i")
 
-    
+    cl.log("Assign catalytic serine to structure.", "i") 
+    uniProtIDs: list = requestDataPDB(requestVariablesPDB.test)
+    cl.log("UniProt IDs for serine peptidase entities:\n{}".format(", ".join(uniProtIDs)))
 
 
 # ---------------------------------------------------------------------------
