@@ -13,6 +13,7 @@ Utility to search and process PDB.
 # ---------------------------------------------------------------------------
 import json
 import requests
+from dataclasses import dataclass
 from ..io.loggingSetup import customLogger
 
 # ---------------------------------------------------------------------------
@@ -22,104 +23,113 @@ from ..io.loggingSetup import customLogger
 cl = customLogger(__name__)
 
 # ---------------------------------------------------------------------------
+# Classes
+# ---------------------------------------------------------------------------
+
+@dataclass
+class queryVariables:
+    """
+    TODO
+    """
+
+    # Finds PDB structures of serine peptidasesfiltered by enzyme classification
+    # (EC) classes, determined by X-ray crystallography at a resolution better 
+    # than 3.0 A. The results are further filtered for redundancy according to
+    # sequence identity.
+    serinePeptidases = {
+      "query": {
+        "type": "group",
+        "logical_operator": "and",
+        "nodes": [
+            {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "attribute": "rcsb_polymer_entity.rcsb_enzyme_class_combined.ec",
+              "operator": "contains_phrase",
+              "value": "EC 3.4.21"
+            }
+          },
+        {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "operator": "exact_match",
+              "value": "X-RAY DIFFRACTION",
+              "attribute": "exptl.method"
+            }
+          },
+          {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "operator": "less_or_equal",
+              "value": 2.5,
+              "attribute": "rcsb_entry_info.resolution_combined"
+            }
+          }
+        ]
+    },
+  "request_options": {
+    "return_all_hits": true,
+    "results_verbosity": "minimal",
+    "group_by": {
+      "aggregation_method": "sequence_identity",
+      "similarity_cutoff": 95
+    },
+    "group_by_return_type": "representatives"
+  },
+      "return_type": "polymer_entity"
+    }
+
+    #
+    uniProtQuery = {
+      "query": {
+        "type": "group",
+        "logical_operator": "and",
+        "nodes": [
+          {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "operator": "exact_match",
+              "value": "P69905",
+              "attribute": "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession"
+            }
+          },
+          {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "operator": "exact_match",
+              "value": "UniProt",
+              "attribute": "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_name"
+            }
+          }
+        ]
+      },
+      "return_type": "polymer_entity"
+    }
+
+
+# ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
 
-def searchXray():
+def searchPDB(query):
     """ 
-    TODO 
-    Test: This query finds PDB structures of virus's thymidine kinase with 
+    This query finds PDB structures of virus's thymidine kinase with 
     substrate/inhibitors, determined by X-ray crystallography at a resolution 
     better than 2.5 A.
     """
     searchUrlEndpoint: str = 'https://search.rcsb.org/rcsbsearch/v2/query'
 
-    jsonQuery = {
-  "query": {
-    "type": "group",
-    "logical_operator": "and",
-    "nodes": [
-      {
-        "type": "terminal",
-        "service": "full_text",
-        "parameters": {
-          "value": "\"thymidine kinase\""
-        }
-      },
-      {
-        "type": "terminal",
-        "service": "text",
-        "parameters": {
-          "operator": "exact_match",
-          "value": "Viruses",
-          "attribute": "rcsb_entity_source_organism.taxonomy_lineage.name"
-        }
-      },
-      {
-        "type": "terminal",
-        "service": "text",
-        "parameters": {
-          "operator": "exact_match",
-          "value": "X-RAY DIFFRACTION",
-          "attribute": "exptl.method"
-        }
-      },
-      {
-        "type": "terminal",
-        "service": "text",
-        "parameters": {
-          "operator": "less_or_equal",
-          "value": 2.5,
-          "attribute": "rcsb_entry_info.resolution_combined"
-        }
-      },
-      {
-        "type": "terminal",
-        "service": "text",
-        "parameters": {
-          "operator": "greater",
-          "attribute": "rcsb_entry_info.nonpolymer_entity_count",
-          "value": 0
-        }
-      }
-    ]
-  },
-  "return_type": "entry"
-}
-
-    jsonQueryUniProt = {
-  "query": {
-    "type": "group",
-    "logical_operator": "and",
-    "nodes": [
-      {
-        "type": "terminal",
-        "service": "text",
-        "parameters": {
-          "operator": "exact_match",
-          "value": "P69905",
-          "attribute": "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession"
-        }
-      },
-      {
-        "type": "terminal",
-        "service": "text",
-        "parameters": {
-          "operator": "exact_match",
-          "value": "UniProt",
-          "attribute": "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_name"
-        }
-      }
-    ]
-  },
-  "return_type": "polymer_entity"
-}
 
     # Make it bytes
-    jsonQueryBytes = json.dumps(jsonQuery).encode("utf-8")
+    jsonQuery = json.dumps(query).encode("utf-8")
 
     cl.log("Performing query", "i")
-    result = requests.post(searchUrlEndpoint, data=jsonQueryBytes)
+    result = requests.post(searchUrlEndpoint, data=jsonQuery)
 
     results = []
     for query_hit in result.json()["result_set"]:

@@ -15,10 +15,9 @@ corresponding active sites.
 import sys
 sys.path.append('../src/')
 
-#import peptaside.io.settings
 from peptaside.io.loggingSetup import customLogger
 from peptaside.io.inputParser import inputParser
-from peptaside.util.PDButilities import searchXray
+from peptaside.util.PDButilities import queryVariables, searchPDB
 
 # ---------------------------------------------------------------------------
 # Logger
@@ -61,7 +60,7 @@ def createPeptidaseActiveSiteCSV():
     :param: peptidaseStructures: list, description...;
     """
 
-    peptidaseStructures = searchXray()
+    peptidaseStructures = searchPDB(queryVariables.serinePeptidases)
     cl.log(peptidaseStructures)
     #cl.log(f"These are the args in main: {vars(args)}")
     #cl.log("Program finished", "i")
