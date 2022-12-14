@@ -6,7 +6,7 @@
 version ='1.0.0'
 # ---------------------------------------------------------------------------
 """
-Utility to search and process PDB.
+Utility to search and process PDB data.
 """
 # ---------------------------------------------------------------------------
 # Imports
@@ -36,7 +36,7 @@ class queryVariables:
     # (EC) classes, determined by X-ray crystallography at a resolution better 
     # than 3.0 A. The results are further filtered for redundancy according to
     # sequence identity.
-    serinePeptidases = {
+    serinePeptidasesEntitySequenceIdentity95 = {
       "query": {
         "type": "group",
         "logical_operator": "and",
@@ -46,8 +46,8 @@ class queryVariables:
             "service": "text",
             "parameters": {
               "attribute": "rcsb_polymer_entity.rcsb_enzyme_class_combined.ec",
-              "operator": "contains_phrase",
-              "value": "EC 3.4.21"
+              "operator": "exact_match",
+              "value": "3.4.21"
             }
           },
         {
@@ -71,7 +71,10 @@ class queryVariables:
         ]
     },
   "request_options": {
-    "return_all_hits": true,
+    "paginate": {
+        "start": 0,
+        "rows": 200000
+        },
     "results_verbosity": "minimal",
     "group_by": {
       "aggregation_method": "sequence_identity",
@@ -79,37 +82,8 @@ class queryVariables:
     },
     "group_by_return_type": "representatives"
   },
-      "return_type": "polymer_entity"
-    }
-
-    #
-    uniProtQuery = {
-      "query": {
-        "type": "group",
-        "logical_operator": "and",
-        "nodes": [
-          {
-            "type": "terminal",
-            "service": "text",
-            "parameters": {
-              "operator": "exact_match",
-              "value": "P69905",
-              "attribute": "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession"
-            }
-          },
-          {
-            "type": "terminal",
-            "service": "text",
-            "parameters": {
-              "operator": "exact_match",
-              "value": "UniProt",
-              "attribute": "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_name"
-            }
-          }
-        ]
-      },
-      "return_type": "polymer_entity"
-    }
+"return_type": "polymer_entity"
+}
 
 
 # ---------------------------------------------------------------------------
@@ -118,9 +92,8 @@ class queryVariables:
 
 def searchPDB(query):
     """ 
-    This query finds PDB structures of virus's thymidine kinase with 
-    substrate/inhibitors, determined by X-ray crystallography at a resolution 
-    better than 2.5 A.
+    Perform PDB search with some query logic. Predefined queries can be found
+    in the dataclass 'queryVariables'.
     """
     searchUrlEndpoint: str = 'https://search.rcsb.org/rcsbsearch/v2/query'
 
@@ -135,10 +108,7 @@ def searchPDB(query):
     for query_hit in result.json()["result_set"]:
         results.append(query_hit["identifier"])
 
-    # String seperator has to be prefixed to turn it into a bytes object 
-    # to use the string seperator to join a list containing bytes objects
-    # and then the decode() method is used to obtain a string.
-    return b''.join(result).decode('utf-8')
+    return results
 
 
 def searchStructureMotif():

@@ -42,7 +42,6 @@ def initializePeptaside():
     return parser.args
 
 
-
 def createPeptidaseActiveSiteCSV():
     """
     Create a CSV file which contains peptidases and their active sites.
@@ -51,7 +50,6 @@ def createPeptidaseActiveSiteCSV():
     information from PDB.
     Information can be found in UniProt json download
     'Active site' or 'Binding site'
-    - search PDB for available structures with certain quality
     - search maybe UniProt to find active site residues
     - fill csv with relevant information
     TODO: Later this should be a database with additional residues for
@@ -60,14 +58,16 @@ def createPeptidaseActiveSiteCSV():
     :param: peptidaseStructures: list, description...;
     """
 
-    peptidaseStructures = searchPDB(queryVariables.serinePeptidases)
-    cl.log(peptidaseStructures)
-    #cl.log(f"These are the args in main: {vars(args)}")
-    #cl.log("Program finished", "i")
-    #cl.log("Write to output file")
-    #cl.log("Write to csv file", output = args.outputCSV)
-	
+    cl.log("Performing PDB search for serine peptidases with the EC code 3.4.21.", "i")
+    serinePeptidaseSearchResults: list = searchPDB(queryVariables.serinePeptidasesEntitySequenceIdentity95)
+
+    cl.log("PDB search results for serine peptidases with the EC code 3.4.21:\n{}".format(", ".join(serinePeptidaseSearchResults)))
+    cl.log(f"Results for the PDB search:\n{serinePeptidaseSearchResults}", "i")
+    cl.log(f"Results written to {args.outputLog}", "i")
+
     
+
+
 # ---------------------------------------------------------------------------
 # Program
 # ---------------------------------------------------------------------------
