@@ -142,6 +142,8 @@ class inputParser(baseParser):
     def __init__(self):
         """
         TODO
+        !!! Make it more general, that every application can add the respective command line arguments.
+        !!! Here should be a method to generate additional arguments
         """
         self.__class__._args = self._parseAdditionalArguments().parse_args()
 

@@ -6,8 +6,8 @@
 version ='1.0.0'
 # ---------------------------------------------------------------------------
 """
-Application to prepare a list of peptidases from the PDB with their
-corresponding active sites.
+Application to prepare a list of peptidase entities from the PDB with their
+corresponding active sites nucleophiles and write them to a CSV file.
 """
 # ---------------------------------------------------------------------------
 # Imports
@@ -21,6 +21,8 @@ from peptaside.util.PDButilities import queryVariablesPDB, \
                                         searchPDB, \
                                         requestVariablesPDB, \
                                         requestDataPDB
+from peptaside.util.uniProtUtilities import requestDataUniProt, \
+                                        requestVariablesUniProt
 
 # ---------------------------------------------------------------------------
 # Logger
@@ -39,6 +41,7 @@ def initializePeptaside():
 
     # Parse and process the settings and input arguments
     parser = inputParser()
+    # TODO make the parser more general!!!
     # Set up the user-defined loglevel and output
     cl.setUpLogger(usrOutput = parser.args.outputLog, loglevel = parser.args.verbosity)
     
@@ -63,16 +66,13 @@ def createPeptidaseActiveSiteCSV():
 
     cl.log("Performing PDB search for serine peptidases with the EC code 3.4.21.", "i")
     serinePeptidaseSearchResults: list = searchPDB(queryVariablesPDB.serinePeptidasesEntities)
+    cl.log("{} PDB entities found for serine peptidases with the EC code 3.4.21:\n{}".format(len(serinePeptidaseSearchResults), ", ".join(serinePeptidaseSearchResults)), "i")
 
-    cl.log("PDB search results for serine peptidases with the EC code 3.4.21:\n{}".format(", ".join(serinePeptidaseSearchResults)))
-    cl.log(f"{len(serinePeptidaseSearchResults)} results for the PDB search:\n{serinePeptidaseSearchResults}", "i")
-    cl.log(f"Results written to {args.outputLog}", "i")
-
-    cl.log("Assign catalytic serine to structure.", "i") 
+    cl.log("Assign catalytic serine to structure using UniProt.", "i") 
     uniProtIDs: list = requestDataPDB(requestVariablesPDB.uniProtIDs(entity_ids=serinePeptidaseSearchResults))
-    cl.log("UniProt IDs for serine peptidase entities:\n{}".format(", ".join(uniProtIDs)))
-    cl.log("UniProt IDs for serine peptidase entities:\n{}".format(", ".join(uniProtIDs)), "i")
-    cl.log("Obtain the active site serine via UniProt and combine with previous information to CSV", "i")
+    cl.log(f"UniProt IDs for serine peptidase entities:\n{uniProtIDs}", "d")
+    cl.log("Obtain the active site serine via UniProt and combine with previous information and write to CSV", "d")
+    requestDataUniProt(requestVariablesUniProt.getActiveSiteResidues(uniProt_ids=[uniProtIDs[item][1] for item in range(len(uniProtIDs))])) 
 
 
 # ---------------------------------------------------------------------------

@@ -144,23 +144,25 @@ def requestDataPDB(query):
     """
     TODO
     """
-    searchUrlEndpoint: str = 'https://data.rcsb.org/graphql'
+    #searchUrlEndpoint: str = 'https://data.rcsb.org/graphql'
     cl.log("Performing query", "i")
     #result = requests.post(searchUrlEndpoint, data={'query': query})
     result = requests.get(f'https://data.rcsb.org/graphql?query={query}')
     results = []
-    for data in result.json()["data"]:
-        for polymerEntity in data["polymer_entities"]:
-            for identifier in polymerEntity:
-                for entry in identifier:
-                     results.append(entry)
-    cl.log(results, "i")
+    if result.status_code == 200:
+        response = result.json()['data']['polymer_entities']
+        for item, entity in enumerate(response):
+            entry_id = response[item]['rcsb_polymer_entity_container_identifiers']['entry_id']
+            entity_id = response[item]['rcsb_polymer_entity_container_identifiers']['entity_id']
+            uniprot_ids = response[item]['rcsb_polymer_entity_container_identifiers']['uniprot_ids']
+            if len(response[item]['rcsb_polymer_entity_container_identifiers']['uniprot_ids']) == 1:
+                results.append([entry_id+'_'+entity_id, "".join(uniprot_ids)])
+            else:
+                cl.log(f"Entity {entry_id+'_'+entity_id} was discarded, since it has two uniprot_ids: {uniprot_ids}", "i")
+    else: cl.log(f"No data obtained from PDB, status code: {result.status_code} ", "w")
+    cl.log(results, "d")
 
-    #{'data': {'polymer_entities': [{'rcsb_polymer_entity_container_identifiers': {'entry_id': '2OQ5', 'entity_id': '1', 'uniprot_ids': ['Q9UL52']}}, {'rcsb_polymer_entity_container_identifiers': {'entry_id': '2Z3B', 'entity_id': '1', 'uniprot_ids': ['P39070']}}, {'rcsb_polymer_entity_container_identifiers': {'entry_id': '3TJQ', 'entity_id': '1', 'uniprot_ids': ['Q92743']}}]}}
-
-
-    return result.json()["data"]
-
+    return results
 
 
 def searchStructureMotif():
