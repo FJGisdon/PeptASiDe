@@ -43,21 +43,35 @@ class requestVariablesUniProt:
 # Functions
 # ---------------------------------------------------------------------------
 
-def requestDataUniProt(query):
+def requestDataUniProt(query: list):
     """
     TODO
     """
     cl.log("Performing query", "i")
+    cl.log(query, "d")
     results = []
+    if isinstance(query, list):
+        pass
+    else:
+        query = [query]
+
     for item in query:
         cl.log(f'https://rest.uniprot.org/uniprotkb/search?format=json&fields=accession%2Cid%2Cft_act_site&query=%28{item}%29' ,"d")
         result = requests.get(f'https://rest.uniprot.org/uniprotkb/search?format=json&fields=accession%2Cid%2Cft_act_site&query=%28{item}%29')
         if result.status_code == 200:
-            response = result.json()
+            response = result.json()['results'][0]
+            for number, description in enumerate(response):
+                primaryAccession = response['primaryAccession']
+                activeSite = []
+                for feature in response['features']:
+                    if feature['type'] == 'Active site':
+                         activeSite.append(feature['location']['start']['value'])
+
         else: cl.log(f"No data obtained from UniProt, status code: {result.status_code} ", "w")
-        results.append(response)
-        # results:0:primaryAccession/uniProtkbId/features:0/1/2:type-Active site/location:start:value-220/modifier-EXACT
-    cl.log(results, "i")
+        if not activeSite:
+            cl.log(f"No active site information available on UniProt for accession {primaryAccession}\n->Discarted", "i")
+        else:
+            results.append([primaryAccession, activeSite])
+    cl.log(results, "d")
 
     return results
-

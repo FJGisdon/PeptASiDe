@@ -72,8 +72,13 @@ def createPeptidaseActiveSiteCSV():
     uniProtIDs: list = requestDataPDB(requestVariablesPDB.uniProtIDs(entity_ids=serinePeptidaseSearchResults))
     cl.log(f"UniProt IDs for serine peptidase entities:\n{uniProtIDs}", "d")
     cl.log("Obtain the active site serine via UniProt and combine with previous information and write to CSV", "d")
-    requestDataUniProt(requestVariablesUniProt.getActiveSiteResidues(uniProt_ids=[uniProtIDs[item][1] for item in range(len(uniProtIDs))])) 
+    uniProtActiveSites: list = requestDataUniProt(requestVariablesUniProt.getActiveSiteResidues(uniProt_ids=[uniProtIDs[item][1] for item in range(len(uniProtIDs))])) 
+    print(uniProtActiveSites, len(uniProtActiveSites))
 
+    # TODO
+    # - Map the active site information with the UniProt ID to the PDB entity
+    #   to run PTGL and obtain the aa graph
+    # - Before running PTGL check, which residue is the nucleophile
 
 # ---------------------------------------------------------------------------
 # Program
