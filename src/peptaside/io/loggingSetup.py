@@ -19,6 +19,7 @@ name of the logger will always adapted to the name of the respective file.
 # ---------------------------------------------------------------------------
 import logging
 import sys
+import csv
 
 # ---------------------------------------------------------------------------
 # Classes
@@ -163,5 +164,20 @@ class customLogger():
             if output is None:
                 self.__class__._logOutput.write(message + "\n")
             else: output.write(message + "\n")
+
+
+
+    def logCSV(self, outputFile: str, inputDict: dict, header: list = None):
+        """
+
+        Write csv file.
+
+        """
+
+        with open(outputFile, 'w') as csvFile:
+            writer = csv.DictWriter(csvFile, fieldnames=header)
+            writer.writeheader()
+            for key, values in sorted(inputDict.items()):
+                writer.writerow(str(key) + "," + ",".join(values)) 
 
 # ---------------------------------------------------------------------------

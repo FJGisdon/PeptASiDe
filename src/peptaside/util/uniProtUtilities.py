@@ -56,22 +56,22 @@ def requestDataUniProt(query: list):
         query = [query]
 
     for item in query:
-        cl.log(f'https://rest.uniprot.org/uniprotkb/search?format=json&fields=accession%2Cid%2Cft_act_site&query=%28{item}%29' ,"d")
-        result = requests.get(f'https://rest.uniprot.org/uniprotkb/search?format=json&fields=accession%2Cid%2Cft_act_site&query=%28{item}%29')
+        cl.log(f'https://rest.uniprot.org/uniprotkb/search?format=json&fields=accession%2Cid%2Cft_act_site%2Csequence&query=%28{item}%29' ,"d")
+        result = requests.get(f'https://rest.uniprot.org/uniprotkb/search?format=json&fields=accession%2Cid%2Cft_act_site%2Csequence&query=%28{item}%29')
         if result.status_code == 200:
             response = result.json()['results'][0]
             for number, description in enumerate(response):
-                primaryAccession = response['primaryAccession']
-                activeSite = []
+                primaryAccession: str = response['primaryAccession']
+                activeSite: list = []
+                sequence: str = response['sequence']['value']
                 for feature in response['features']:
                     if feature['type'] == 'Active site':
                          activeSite.append(feature['location']['start']['value'])
-
         else: cl.log(f"No data obtained from UniProt, status code: {result.status_code} ", "w")
         if not activeSite:
             cl.log(f"No active site information available on UniProt for accession {primaryAccession}\n->Discarted", "i")
         else:
-            results.append([primaryAccession, activeSite])
+            results.append([primaryAccession, activeSite, sequence])
     cl.log(results, "d")
 
     return results
