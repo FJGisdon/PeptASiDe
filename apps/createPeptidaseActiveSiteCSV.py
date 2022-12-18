@@ -75,16 +75,17 @@ def createPeptidaseActiveSiteCSV():
     uniProtActiveSites: list = requestDataUniProt(requestVariablesUniProt.getActiveSiteResidues(uniProt_ids=[uniProtIDs[item][1] for item in range(len(uniProtIDs))])) 
     
     outputDict = dict()
-    uniProtIDsDict = dict(uniProtIDs)
-    uniProtActiveSitesDict = dict((item[0], item[1:]) for item in uniProtActiveSites)
-    activeSiteResiduesList = list(range(3))
-    for key, value in uniProtIDsDict.items():
-        if value in uniProtActiveSitesDict.keys():
-            outputDict[key] = [value, \
-                                ", ".join([uniProtActiveSitesDict[value][0][entry] for entry in range(3)]), \
-                                uniProtActiveSitesDict[value][1]]
+    for position1, item1 in enumerate(uniProtActiveSites):
+        for item2 in uniProtIDs:
+            if item1[0] == item2[1]:
+                #outputDict.update({item2[0], item1[0], item1[2]})
+                cl.log(item2[0] , "i")
+                cl.log(item1[0] , "i")
+                cl.log(item1[1] , "i")
+                cl.log(item1[2] , "i")
+                cl.log(item1[2][item1[1][0]], "i")
     print(outputDict)
-    
+
     header = ['PDB entity', 'UniProtID', 'Active site', 'Sequence']
     cl.logCSV(args.outputCSV.name, outputDict, header) 
 

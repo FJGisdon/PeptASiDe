@@ -75,3 +75,5 @@ def requestDataUniProt(query: list):
     cl.log(results, "d")
 
     return results
+
+# ---------------------------------------------------------------------------
