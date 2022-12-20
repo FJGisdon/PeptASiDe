@@ -60,13 +60,14 @@ def requestDataUniProt(query: list):
         result = requests.get(f'https://rest.uniprot.org/uniprotkb/search?format=json&fields=accession%2Cid%2Cft_act_site%2Csequence&query=%28{item}%29')
         if result.status_code == 200:
             response = result.json()['results'][0]
-            for number, description in enumerate(response):
-                primaryAccession: str = response['primaryAccession']
-                activeSite: list = []
-                sequence: str = response['sequence']['value']
+            primaryAccession: str = response['primaryAccession']
+            activeSite: list = []
+            sequence: str = response['sequence']['value']
+            if response.get('features') is not None:
+                print(primaryAccession)
                 for feature in response['features']:
                     if feature['type'] == 'Active site':
-                         activeSite.append(feature['location']['start']['value'])
+                        activeSite.append(feature['location']['start']['value'])
         else: cl.log(f"No data obtained from UniProt, status code: {result.status_code} ", "w")
         if not activeSite:
             cl.log(f"No active site information available on UniProt for accession {primaryAccession}\n->Discarted", "i")
