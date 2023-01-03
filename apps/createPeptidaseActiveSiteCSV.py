@@ -75,16 +75,34 @@ def createPeptidaseActiveSiteCSV():
     uniProtActiveSites: list = requestDataUniProt(requestVariablesUniProt.getActiveSiteResidues(uniProt_ids=[uniProtIDs[item][1] for item in range(len(uniProtIDs))])) 
     
     outputDict = dict()
-    for position1, item1 in enumerate(uniProtActiveSites):
+    count_normal = 0
+    count_plus = 0
+    count_else = 0
+    count_total = 0
+    for item1 in uniProtActiveSites:
         for item2 in uniProtIDs:
             if item1[0] == item2[1]:
+                count_total+=1
                 #outputDict.update({item2[0], item1[0], item1[2]})
-                cl.log(item2[0] , "i")
-                cl.log(item1[0] , "i")
-                cl.log(item1[1] , "i")
-                cl.log(item1[2] , "i")
-                cl.log(item1[2][item1[1][0]], "i")
-    print(outputDict)
+                cl.log(item2[0] , "d") # PDB entity
+                cl.log(item1[0] , "d") # UniProt accession
+                cl.log(item1[1] , "d") # active site information
+                cl.log(item1[2] , "d") # sequence
+                cl.log(f'{item2[0]}: {[item1[0], item1[1]]}', "i")
+                for number in item1[1]:
+                    if item1[2][number] == 'S':
+                        cl.log(f'{number}, {item1[2][number]}', "i")
+                        count_normal+=1
+                    elif item1[2][number+1] == 'S':
+                        cl.log(f'+1 - {number+1}, {item1[2][number+1]}', "i")
+                        count_plus+=1
+                    else:
+                        count_else+=1
+    cl.log(f'Counts for serine in listed position: {count_normal}, in position +1: {count_plus}, else: {count_else}', "i")
+    cl.log(f'Total entities: {count_total}', "i")
+    # TODO Finding the positions of the active site serine, this does not match for a lot of
+    #       structures, even if I consider the initial methionine is not counted
+    #print(outputDict)
 
     header = ['PDB entity', 'UniProtID', 'Active site', 'Sequence']
     cl.logCSV(args.outputCSV.name, outputDict, header) 

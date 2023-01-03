@@ -64,7 +64,7 @@ def requestDataUniProt(query: list):
             activeSite: list = []
             sequence: str = response['sequence']['value']
             if response.get('features') is not None:
-                print(primaryAccession)
+                cl.log(f'{primaryAccession}', "d")
                 for feature in response['features']:
                     if feature['type'] == 'Active site':
                         activeSite.append(feature['location']['start']['value'])
