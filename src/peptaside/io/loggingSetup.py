@@ -175,9 +175,9 @@ class customLogger():
         """
 
         with open(outputFile, 'w') as csvFile:
-            writer = csv.DictWriter(csvFile, fieldnames=header)
-            writer.writeheader()
+            writer = csv.writer(csvFile)
+            writer.writerow(header)
             for key, values in sorted(inputDict.items()):
-                writer.writerow(str(key) + "," + ",".join(values)) 
+                writer.writerow([str(key)] + values) 
 
 # ---------------------------------------------------------------------------

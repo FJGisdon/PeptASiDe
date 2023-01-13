@@ -98,13 +98,26 @@ def createPeptidaseActiveSiteCSV():
                         count_plus+=1
                     else:
                         count_else+=1
+
+                # Write the results so far to csv, take the first matching serine as active nucleophile (preliminary)
+                for number in item1[1]:
+                    if item1[2][number] == 'S':
+                        outputDict[item2[0].split('_')[0]] = [str(item2[0]), \
+                                                                str(item1[0]), \
+                                                                str(number), \
+                                                                str(item1[2])]
+                        break
+
     cl.log(f'Counts for serine in listed position: {count_normal}, in position +1: {count_plus}, else: {count_else}', "i")
     cl.log(f'Total entities: {count_total}', "i")
     # TODO Finding the positions of the active site serine, this does not match for a lot of
     #       structures, even if I consider the initial methionine is not counted
+    #       For now I will just take those results, which have one active site with a serine
+    #       in the correct position. This should be around 8 results.
     #print(outputDict)
 
-    header = ['PDB entity', 'UniProtID', 'Active site', 'Sequence']
+    header = ['PDB-ID', 'PDB entity', 'UniProtID', 'Active site serine', 'Sequence']
+
     cl.logCSV(args.outputCSV.name, outputDict, header) 
 
     # TODO
