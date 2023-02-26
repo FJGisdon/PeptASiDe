@@ -55,9 +55,71 @@ class queryVariablesPDB:
     TODO
     """
 
-    # Finds PDB structures of serine peptidasesfiltered by enzyme classification
+	# Finds PDB structures of serine peptidases filtered by enzyme classification
     # (EC) classes, determined by X-ray crystallography at a resolution better 
-    # than 3.0 A. The results are further filtered for redundancy according to
+    # than 3.5 A. The results are further filtered for redundancy according to
+    # matching_uniprot_accession and also mutant structures are discarded.
+    cysteinePeptidasesEntities = {
+      "query": {
+        "type": "group",
+        "logical_operator": "and",
+        "nodes": [
+            {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "attribute": "rcsb_polymer_entity.rcsb_enzyme_class_combined.ec",
+              "operator": "exact_match",
+              "value": "3.4.22"
+            }
+          },
+            {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "attribute": "entity_poly.rcsb_mutation_count",
+              "operator": "equals",
+              "value": 0
+            }
+          },
+        {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "operator": "exact_match",
+              "value": "X-RAY DIFFRACTION",
+              "attribute": "exptl.method"
+            }
+          },
+          {
+            "type": "terminal",
+            "service": "text",
+            "parameters": {
+              "operator": "less_or_equal",
+              "value": 3.5,
+              "attribute": "rcsb_entry_info.resolution_combined"
+            }
+          }
+        ]
+    },
+  "request_options": {
+    "paginate": {
+        "start": 0,
+        "rows": 200000
+        },
+    "results_verbosity": "minimal",
+    "group_by": {
+      "aggregation_method": "matching_uniprot_accession"
+    },
+    "group_by_return_type": "representatives"
+  },
+"return_type": "polymer_entity"
+}
+
+
+    # Finds PDB structures of serine peptidases filtered by enzyme classification
+    # (EC) classes, determined by X-ray crystallography at a resolution better 
+    # than 3.5 A. The results are further filtered for redundancy according to
     # matching_uniprot_accession and also mutant structures are discarded.
     serinePeptidasesEntities = {
       "query": {
@@ -96,7 +158,7 @@ class queryVariablesPDB:
             "service": "text",
             "parameters": {
               "operator": "less_or_equal",
-              "value": 2.5,
+              "value": 3.5,
               "attribute": "rcsb_entry_info.resolution_combined"
             }
           }
@@ -163,31 +225,6 @@ def requestDataPDB(query):
     cl.log(results, "d")
 
     return results
-
-def getActiveSiteResidues(pdbID):
-    """ TODO """
-    # Set the base URL for the CSA API
-    base_url = "https://www.ebi.ac.uk/thornton-srv/databases/CSA/rest/"
-
-    # Set the PDB ID of the entry you want to search for
-    pdb_id = pdbID
-
-    # uild the API endpoint URL
-    endpoint = f"enzymes/ative_site_residues/{pdb_id}"
-
-    # Send a GET request to the API endpoint
-    response = requests.get(base_url + endpoint)
-
-    #Check if the request was successful (status code 200)
-    if response.status_code == 200:
-        #Parse the resonse as JSON
-        data = json.loads(response.content)
-        #Print the active site residues for the specified PDB entry
-        print(f"PDB ID:{data['pdb_id']}")
-        print(f"Active site residues: {data['active_site_residues']}")
-        return data['active_site_residues']
-    else:
-        print(f"Error: {response.status_code} {response.reason}")
 
 
 def searchStructureMotif():

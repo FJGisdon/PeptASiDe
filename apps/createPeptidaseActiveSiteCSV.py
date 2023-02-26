@@ -49,30 +49,20 @@ def initializePeptaside():
     return parser.args
 
 
-def createPeptidaseActiveSiteCSV():
+def createActiveSiteCSV(ECcode):
     """
     Create a CSV file which contains peptidases and their active sites.
     Search for peptidases with active site residues in MEROPS/UniProt/...
-    Only take those, whith complete information and obtain structural
-    information from PDB.
-    Information can be found in UniProt json download
-    'Active site' or 'Binding site'
-    - search maybe UniProt to find active site residues
-    - fill csv with relevant information
-    TODO: Later this should be a database with additional residues for
-            potential active sites.
 
-    :param: peptidaseStructures: list, description...;
+    param: str ECcode
     """
+    cl.log(f"Performing PDB search for EC code {ECcode}.", "i")
+    searchResults: list = searchPDB(queryVariablesPDB.serinePeptidasesEntities)
+    cl.log("{} PDB entities found with the EC code {}:\n{}".format(len(searchResults), ECcode, ", ".join(searchResults)), "i")
 
-    cl.log("Performing PDB search for serine peptidases with the EC code 3.4.21.", "i")
-    serinePeptidaseSearchResults: list = searchPDB(queryVariablesPDB.serinePeptidasesEntities)
-    cl.log("{} PDB entities found for serine peptidases with the EC code 3.4.21:\n{}".format(len(serinePeptidaseSearchResults), ", ".join(serinePeptidaseSearchResults)), "i")
-
-    cl.log("Assign catalytic serine to structure using UniProt.", "i") 
-    uniProtIDs: list = requestDataPDB(requestVariablesPDB.uniProtIDs(entity_ids=serinePeptidaseSearchResults))
-    cl.log(f"UniProt IDs for serine peptidase entities:\n{uniProtIDs}", "d")
-    cl.log("Obtain the active site (should be 1-3 residues, for now we just need the active site serine) and the sequence (to check the active site residues) via UniProt and combine with previous information and write to CSV", "d")
+    cl.log("Assign catalytic residues to structure using UniProt.", "i") 
+    uniProtIDs: list = requestDataPDB(requestVariablesPDB.uniProtIDs(entity_ids=searchResults))
+    cl.log(f"UniProt IDs for all entities:\n{uniProtIDs}", "d")
     uniProtActiveSites: list = extractActiveSites(requestVariablesUniProt.getActiveSiteResidues(uniProt_ids=[uniProtIDs[item][1] for item in range(len(uniProtIDs))])) 
     
     outputDict = dict()
@@ -84,10 +74,9 @@ def createPeptidaseActiveSiteCSV():
                                                     result[1], \
                                                     result[2],\
                                                     ]
-
-    header = ['PDB-ID', 'PDB entity', 'UniProtID', 'Residue number', 'Identity']
-
-    cl.logCSV(args.outputCSV.name, outputDict, header) 
+    # Check the data, shouldn't some of the entries appear more than once for different active site residues?
+    # The dictionary contains entries more than once. For each active site residue, which was found one entry is generated. This makes processing later easier.
+    return outputDict
 
 # ---------------------------------------------------------------------------
 # Program
@@ -96,6 +85,10 @@ if __name__ == "__main__":
     # Parse settings and input arguments and eventually customize the logger
     args = initializePeptaside()
     # Start the application
-    createPeptidaseActiveSiteCSV()
-
+    resultDict: dict = {}
+    # TODO: make it universal to use with user-specific EC number
+    resultDict = createActiveSiteCSV("3.4.21")
+    # Save the dictionary as CSV
+    header = ['PDB-ID', 'PDB entity', 'UniProtID', 'Residue number', 'Identity']
+    cl.logCSV(args.outputCSV.name, resultDict, header)
 # ---------------------------------------------------------------------------
