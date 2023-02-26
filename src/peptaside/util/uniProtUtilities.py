@@ -14,6 +14,7 @@ Utility to search and process UniProt data.
 import json
 import requests
 from dataclasses import dataclass
+from xml.etree import ElementTree
 from ..io.loggingSetup import customLogger
 
 # ---------------------------------------------------------------------------
@@ -76,5 +77,52 @@ def requestDataUniProt(query: list):
     cl.log(results, "d")
 
     return results
+
+
+def extractActiveSites(uniProtIDs: list):
+    """
+    TODO
+    """
+    results = []
+    for uniprot_id in uniProtIDs:
+        cl.log(f'Active site search for UniProt ID {uniprot_id}', 'i')
+        # Define the URL for the UniProt REST API request
+        url = f"https://www.uniprot.org/uniprot/{uniprot_id}.xml"
+
+        # Send the request to the UniProt server and retrieve the response
+        response = requests.get(url)
+
+        # Extract the active site residue numbers from the XML
+        active_site_residues = []
+        if response.ok:
+            xml_content = response.content
+            root = ElementTree.fromstring(xml_content)
+            for feature in root.findall(".//{http://uniprot.org/uniprot}feature[@type='active site']"):
+                positions = feature.find("{http://uniprot.org/uniprot}location/{http://uniprot.org/uniprot}position")
+                if positions is not None and positions.get("position") is not None:
+                    active_site_residue_number = int(positions.get("position"))
+                    active_site_residues.append(active_site_residue_number)
+        else:
+            print(f"Error: {response.status_code} - {response.reason}")
+
+        # Retrieve the protein sequence from the UniProt REST API
+        response = requests.get(f"https://www.uniprot.org/uniprot/{uniprot_id}.fasta")
+        if response.ok:
+            sequence_lines = response.text.split("\n")
+            sequence = "".join(sequence_lines[1:])
+        else:
+            print(f"Error: {response.status_code} - {response.reason}")
+
+        # Get the amino acid codes for the active site residues from the protein sequence
+        active_site_residue_names = []
+        for active_site_residue_number in active_site_residues:
+            active_site_residue_name = sequence[active_site_residue_number - 1]
+            active_site_residue_names.append(active_site_residue_name)
+            results.append([uniprot_id, active_site_residue_number, active_site_residue_name])
+        # Print the active site residue numbers and residue names
+        #for i in range(len(active_site_residues)):
+        #    print(f"Active site residue {active_site_residues[i]} ({active_site_residue_names[i]})")
+    return results        
+
 
 # ---------------------------------------------------------------------------

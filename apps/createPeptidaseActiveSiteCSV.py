@@ -22,7 +22,8 @@ from peptaside.util.PDButilities import queryVariablesPDB, \
                                         requestVariablesPDB, \
                                         requestDataPDB
 from peptaside.util.uniProtUtilities import requestDataUniProt, \
-                                        requestVariablesUniProt
+                                        requestVariablesUniProt, \
+                                        extractActiveSites
 
 # ---------------------------------------------------------------------------
 # Logger
@@ -72,56 +73,21 @@ def createPeptidaseActiveSiteCSV():
     uniProtIDs: list = requestDataPDB(requestVariablesPDB.uniProtIDs(entity_ids=serinePeptidaseSearchResults))
     cl.log(f"UniProt IDs for serine peptidase entities:\n{uniProtIDs}", "d")
     cl.log("Obtain the active site (should be 1-3 residues, for now we just need the active site serine) and the sequence (to check the active site residues) via UniProt and combine with previous information and write to CSV", "d")
-    uniProtActiveSites: list = requestDataUniProt(requestVariablesUniProt.getActiveSiteResidues(uniProt_ids=[uniProtIDs[item][1] for item in range(len(uniProtIDs))])) 
+    uniProtActiveSites: list = extractActiveSites(requestVariablesUniProt.getActiveSiteResidues(uniProt_ids=[uniProtIDs[item][1] for item in range(len(uniProtIDs))])) 
     
     outputDict = dict()
-    count_normal = 0
-    count_plus = 0
-    count_else = 0
-    count_total = 0
-    for item1 in uniProtActiveSites:
-        for item2 in uniProtIDs:
-            if item1[0] == item2[1]:
-                count_total+=1
-                #outputDict.update({item2[0], item1[0], item1[2]})
-                cl.log(item2[0] , "d") # PDB entity
-                cl.log(item1[0] , "d") # UniProt accession
-                cl.log(item1[1] , "d") # active site information
-                cl.log(item1[2] , "d") # sequence
-                cl.log(f'{item2[0]}: {[item1[0], item1[1]]}', "i")
-                for number in item1[1]:
-                    if item1[2][number] == 'S':
-                        cl.log(f'{number}, {item1[2][number]}', "i")
-                        count_normal+=1
-                    elif item1[2][number+1] == 'S':
-                        cl.log(f'+1 - {number+1}, {item1[2][number+1]}', "i")
-                        count_plus+=1
-                    else:
-                        count_else+=1
+    for entry in uniProtIDs:
+        for result in uniProtActiveSites:
+            if entry[1] == result[0]:
+                outputDict[entry[0].split('_')[0]] = [str(entry[0]), \
+                                                    str(entry[1]), \
+                                                    result[1], \
+                                                    result[2],\
+                                                    ]
 
-                # Write the results so far to csv, take the first matching serine as active nucleophile (preliminary)
-                for number in item1[1]:
-                    if item1[2][number] == 'S':
-                        outputDict[item2[0].split('_')[0]] = [str(item2[0]), \
-                                                                str(item1[0]), \
-                                                                str(number), \
-                                                                str(item1[2])]
-                        break
-
-    cl.log(f'Counts for serine in listed position: {count_normal}, in position +1: {count_plus}, else: {count_else}', "i")
-    cl.log(f'Total entities: {count_total}', "i")
-    # TODO Finding the positions of the active site serine, this does not match for a lot of
-    #       structures, even if I consider the initial methionine is not counted
-    #       For now I will just take those results, which have one active site with a serine
-    #       in the correct position. This should be around 8 results.
-    #print(outputDict)
-
-    header = ['PDB-ID', 'PDB entity', 'UniProtID', 'Active site serine', 'Sequence']
+    header = ['PDB-ID', 'PDB entity', 'UniProtID', 'Residue number', 'Identity']
 
     cl.logCSV(args.outputCSV.name, outputDict, header) 
-
-    # TODO
-    # - Before running PTGL check, which residue is the nucleophile
 
 # ---------------------------------------------------------------------------
 # Program

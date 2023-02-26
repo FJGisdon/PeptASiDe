@@ -164,6 +164,31 @@ def requestDataPDB(query):
 
     return results
 
+def getActiveSiteResidues(pdbID):
+    """ TODO """
+    # Set the base URL for the CSA API
+    base_url = "https://www.ebi.ac.uk/thornton-srv/databases/CSA/rest/"
+
+    # Set the PDB ID of the entry you want to search for
+    pdb_id = pdbID
+
+    # uild the API endpoint URL
+    endpoint = f"enzymes/ative_site_residues/{pdb_id}"
+
+    # Send a GET request to the API endpoint
+    response = requests.get(base_url + endpoint)
+
+    #Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        #Parse the resonse as JSON
+        data = json.loads(response.content)
+        #Print the active site residues for the specified PDB entry
+        print(f"PDB ID:{data['pdb_id']}")
+        print(f"Active site residues: {data['active_site_residues']}")
+        return data['active_site_residues']
+    else:
+        print(f"Error: {response.status_code} {response.reason}")
+
 
 def searchStructureMotif():
     """ TODO """
